@@ -20,6 +20,8 @@ Expected non-security behavior:
 - invalid JSON/schema returns exit `2` with a field path;
 - valid no-solution input returns exit `1` and a diagnostic report;
 - HTML and SVG text derived from input is escaped;
+- identifiers containing control characters are rejected and formula-shaped
+  CSV text is emitted as text rather than an executable spreadsheet formula;
 - output names derive only from the validated ASCII scenario name.
 
 TarpScout's explicit safety disclaimer is not a vulnerability workaround. A

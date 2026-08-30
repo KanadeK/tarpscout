@@ -54,6 +54,12 @@ def report_dict(scenario: Scenario, result: SolveResult) -> dict[str, object]:
     }
 
 
+def _spreadsheet_safe(value: object) -> object:
+    if isinstance(value, str) and value.lstrip().startswith(("=", "+", "-", "@")):
+        return "'" + value
+    return value
+
+
 def _csv_text(result: SolveResult) -> str:
     stream = io.StringIO(newline="")
     writer = csv.writer(stream, lineterminator="\n")
@@ -78,7 +84,8 @@ def _csv_text(result: SolveResult) -> str:
         for line in candidate.geometry.lines:
             use = uses.get(line.id)
             writer.writerow(
-                [
+                _spreadsheet_safe(value)
+                for value in [
                     candidate.geometry.id,
                     line.id,
                     line.start.x,

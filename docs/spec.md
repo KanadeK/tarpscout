@@ -86,7 +86,7 @@ Each candidate must pass all hard constraints:
 - reusable cords, when supplied, admit a one-to-one assignment to the required
   ridge and guy lines.
 
-Cord assignment is an exact finite search that minimizes total unused length.
+Cord assignment is an exact subset dynamic program that minimizes total unused length.
 Candidate ranking is deterministic: wind alignment (when supplied), cord slack,
 distance from the preferred ridge height, then stable geometric identifiers.
 
@@ -115,7 +115,7 @@ Outputs must be byte-stable for the same input and version.
 - Python `>=3.11,<3.15`
 - Python standard library at runtime
 - `argparse` CLI and `dataclasses` domain model
-- `pytest`, `pytest-cov`, `ruff`, `mypy`, and `build` in the locked dev group
+- `pytest`, `pytest-cov`, `ruff`, and `mypy` in the locked dev group
 - uv build backend, wheel plus source archive
 - GitHub Actions on Ubuntu/Python 3.11 and Windows/Python 3.14
 

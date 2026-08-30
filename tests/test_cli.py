@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 import subprocess
 import sys
@@ -62,6 +63,24 @@ def test_feasible_solve_writes_complete_artifact_set(tmp_path: Path) -> None:
     assert "left-start" in plan
     elevation = (output / "pine-gap.elevation.svg").read_text(encoding="utf-8")
     assert "stake setback 0.80 m" in elevation
+
+
+def test_csv_quotes_formula_shaped_external_identifiers(tmp_path: Path) -> None:
+    raw = survey_dict()
+    raw["supports"][0]["id"] = "=2+3"
+    raw["cords"][0]["id"] = "@ridge-cord"
+    survey = tmp_path / "site.json"
+    output = tmp_path / "plan"
+    write_survey(survey, raw)
+
+    completed = run_cli("solve", str(survey), "--output", str(output))
+
+    assert completed.returncode == 0, completed.stderr
+    with (output / "pine-gap.lines.csv").open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    assert rows[0]["candidate"].startswith("[")
+    ridge = next(row for row in rows if row["line"] == "ridge")
+    assert ridge["cord"] == "'@ridge-cord"
 
 
 def test_no_solution_writes_only_diagnostic_json_and_exits_one(tmp_path: Path) -> None:

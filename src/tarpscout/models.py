@@ -141,6 +141,8 @@ def _fields(
 def _text(value: object, path: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise InputError(f"{path}: expected non-empty string")
+    if not value.isprintable():
+        raise InputError(f"{path}: expected printable text")
     return value
 
 
@@ -183,6 +185,61 @@ def _polygon_area(points: tuple[Point, ...]) -> float:
         )
         / 2
     )
+
+
+def _cross(first: Point, second: Point, third: Point) -> float:
+    return (second.x - first.x) * (third.y - first.y) - (second.y - first.y) * (third.x - first.x)
+
+
+def _on_segment(point: Point, start: Point, end: Point) -> bool:
+    return (
+        abs(_cross(start, end, point)) <= 1e-9
+        and min(start.x, end.x) - 1e-9 <= point.x <= max(start.x, end.x) + 1e-9
+        and min(start.y, end.y) - 1e-9 <= point.y <= max(start.y, end.y) + 1e-9
+    )
+
+
+def _segments_intersect(first: Point, second: Point, third: Point, fourth: Point) -> bool:
+    first_side = _cross(first, second, third)
+    second_side = _cross(first, second, fourth)
+    third_side = _cross(third, fourth, first)
+    fourth_side = _cross(third, fourth, second)
+    if (
+        (first_side > 1e-9 and second_side < -1e-9) or (first_side < -1e-9 and second_side > 1e-9)
+    ) and (
+        (third_side > 1e-9 and fourth_side < -1e-9) or (third_side < -1e-9 and fourth_side > 1e-9)
+    ):
+        return True
+    return (
+        _on_segment(third, first, second)
+        or _on_segment(fourth, first, second)
+        or _on_segment(first, third, fourth)
+        or _on_segment(second, third, fourth)
+    )
+
+
+def _polygon_is_simple(points: tuple[Point, ...]) -> bool:
+    edge_count = len(points)
+    for first_index, first in enumerate(points):
+        second = points[(first_index + 1) % edge_count]
+        for third_index in range(first_index + 1, edge_count):
+            third = points[third_index]
+            fourth = points[(third_index + 1) % edge_count]
+            adjacent = third_index == first_index + 1 or (
+                first_index == 0 and third_index == edge_count - 1
+            )
+            if not adjacent:
+                if _segments_intersect(first, second, third, fourth):
+                    return False
+                continue
+            shared = second if second in (third, fourth) else first
+            first_other = first if first != shared else second
+            second_other = third if third != shared else fourth
+            if _on_segment(first_other, shared, second_other) or _on_segment(
+                second_other, shared, first_other
+            ):
+                return False
+    return True
 
 
 def _unique(items: list[tuple[str, str]]) -> None:
@@ -262,8 +319,12 @@ def parse_scenario(value: Any) -> Scenario:
         )
         if len(points) < 3:
             raise InputError(f"{path}.polygon: expected at least three points")
+        if len(set(points)) != len(points):
+            raise InputError(f"{path}.polygon: points must be unique")
         if _polygon_area(points) <= 1e-9:
             raise InputError(f"{path}.polygon: area must be non-zero")
+        if not _polygon_is_simple(points):
+            raise InputError(f"{path}.polygon: must be simple")
         stake_zones.append(StakeZone(_text(raw["id"], f"{path}.id"), points))
     if not stake_zones:
         raise InputError("stake_zones: expected at least one polygon")
@@ -343,6 +404,9 @@ def parse_scenario(value: Any) -> Scenario:
     edge_height = _positive(raw["edge_height"], "requirements.edge_height", allow_zero=True)
     if edge_height >= ridge_height.minimum:
         raise InputError("requirements.edge_height: must be below minimum ridge height")
+    search_step = _positive(raw["search_step"], "requirements.search_step")
+    if search_step < 1e-9:
+        raise InputError("requirements.search_step: expected >= 0.000000001")
     max_search_states = _integer(raw["max_search_states"], "requirements.max_search_states")
     if not 1 <= max_search_states <= 1_000_000:
         raise InputError("requirements.max_search_states: expected 1..1000000")
@@ -361,7 +425,7 @@ def parse_scenario(value: Any) -> Scenario:
         _positive(raw["stake_setback"], "requirements.stake_setback"),
         _positive(raw["knot_allowance"], "requirements.knot_allowance", allow_zero=True),
         _positive(raw["coverage_margin"], "requirements.coverage_margin", allow_zero=True),
-        _positive(raw["search_step"], "requirements.search_step"),
+        search_step,
         _positive(raw["end_clearance"], "requirements.end_clearance", allow_zero=True),
         max_search_states,
         wind,

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import math
 from collections import Counter
+from collections.abc import Iterator
 from dataclasses import dataclass
 from itertools import combinations
 
@@ -55,14 +57,15 @@ def _point(origin: Point, axis: Point, distance: float) -> Point:
     return Point(origin.x + axis.x * distance, origin.y + axis.y * distance)
 
 
-def _grid(start: float, stop: float, step: float) -> tuple[float, ...]:
+def _grid(start: float, stop: float, step: float) -> Iterator[float]:
     if start > stop + 1e-9:
-        return ()
+        return
     count = math.floor((stop - start) / step + 1e-9)
-    values = [round(start + index * step, 9) for index in range(count + 1)]
-    if stop - values[-1] > 1e-9:
-        values.append(round(stop, 9))
-    return tuple(values)
+    for index in range(count + 1):
+        yield round(start + index * step, 9)
+    last = round(start + count * step, 9)
+    if stop - last > 1e-9:
+        yield round(stop, 9)
 
 
 def _ridge_line(first: Support, second: Support, height: float, scenario: Scenario) -> LineGeometry:
@@ -107,8 +110,7 @@ def enumerate_geometries(scenario: Scenario) -> GenerationResult:
         high_height = min(
             first.max_height, second.max_height, scenario.requirements.ridge_height.maximum
         )
-        heights = _grid(low_height, high_height, scenario.requirements.search_step)
-        if not heights:
+        if low_height > high_height + 1e-9:
             rejections["ridge_height_unavailable"] += len(scenario.requirements.pitch_types)
             continue
 
@@ -116,7 +118,7 @@ def enumerate_geometries(scenario: Scenario) -> GenerationResult:
             center = _point(first.point, axis, offset)
             ridge_start = _point(center, axis, -scenario.tarp.length / 2)
             ridge_end = _point(center, axis, scenario.tarp.length / 2)
-            for height in heights:
+            for height in _grid(low_height, high_height, scenario.requirements.search_step):
                 for pitch_type in scenario.requirements.pitch_types:
                     orientations = (0,) if pitch_type == "a_frame" else (-1, 1)
                     for orientation in orientations:
@@ -201,9 +203,17 @@ def enumerate_geometries(scenario: Scenario) -> GenerationResult:
                                 _guy_line("guy-low-start", low_start, stake_start, scenario),
                                 _guy_line("guy-low-end", low_end, stake_end, scenario),
                             )
-                        identifier = (
-                            f"{first.id}--{second.id}--{pitch_type}--"
-                            f"o{offset:.3f}--h{height:.3f}--s{orientation:+d}"
+                        identifier = json.dumps(
+                            [
+                                first.id,
+                                second.id,
+                                pitch_type,
+                                f"{offset:.9f}",
+                                f"{height:.9f}",
+                                orientation,
+                            ],
+                            ensure_ascii=False,
+                            separators=(",", ":"),
                         )
                         geometries.append(
                             PitchGeometry(

@@ -43,6 +43,28 @@ def test_degenerate_stake_polygon_is_rejected() -> None:
         parse_scenario(raw)
 
 
+def test_stake_polygon_points_must_be_unique() -> None:
+    raw = survey_dict()
+    raw["stake_zones"][0]["polygon"] = [
+        [0, 0],
+        [3, 0],
+        [3, 2],
+        [0, 2],
+        [0, 0],
+    ]
+
+    with pytest.raises(InputError, match=r"stake_zones\[0\]\.polygon: points must be unique"):
+        parse_scenario(raw)
+
+
+def test_self_intersecting_stake_polygon_is_rejected() -> None:
+    raw = survey_dict()
+    raw["stake_zones"][0]["polygon"] = [[0, 0], [3, 2], [0, 3], [2, 0]]
+
+    with pytest.raises(InputError, match=r"stake_zones\[0\]\.polygon: must be simple"):
+        parse_scenario(raw)
+
+
 def test_boolean_is_not_accepted_as_a_number() -> None:
     raw = survey_dict()
     raw["tarp"]["length"] = True
@@ -82,6 +104,14 @@ def test_name_must_be_non_empty_and_filename_safe() -> None:
         parse_scenario(empty)
     with pytest.raises(InputError, match=r"name: use 1-64 ASCII"):
         parse_scenario(unsafe)
+
+
+def test_identifiers_must_not_contain_control_characters() -> None:
+    raw = survey_dict()
+    raw["supports"][0]["id"] = "west\u0000pine"
+
+    with pytest.raises(InputError, match=r"supports\[0\]\.id: expected printable text"):
+        parse_scenario(raw)
 
 
 def test_numbers_must_be_finite() -> None:
@@ -147,6 +177,7 @@ def test_required_collections_cannot_be_empty() -> None:
         ("pitch_types", ["diamond"], "unsupported 'diamond'"),
         ("slope_angle", {"min": 0.0, "max": 70.0}, "expected 0 < min <= max < 90"),
         ("edge_height", 1.4, "must be below minimum ridge height"),
+        ("search_step", 1e-10, "expected >= 0.000000001"),
         ("max_search_states", 0, "expected 1..1000000"),
         ("wind_from_deg", 360.0, "expected 0 <= value < 360"),
     ],

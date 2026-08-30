@@ -59,7 +59,7 @@ model -> geometry -> pitch candidates -> cord assignment
 | Risk | Mitigation |
 |---|---|
 | Result mistaken for safety approval | Repeat the no-load-model limitation in every report |
-| Unbounded user search | Validate a declared finite grid and maximum state count |
+| Unbounded user search | Generate the grid lazily and enforce the declared maximum state count |
 | Greedy cord mismatch | Use exact assignment with stable minimum-slack ranking |
 | Stale GitHub login | Use official `gh auth login`; never extract credentials |
 

@@ -44,10 +44,11 @@ test failure rather than a second hidden truth.
 
 ## Finite search
 
-For each unordered support pair, `pitches.py` samples positions along the span
-and attachment heights using `search_step`. It generates one A-frame orientation
-and both lean-to orientations requested by the input, stopping at the explicit
-`max_search_states` boundary.
+For each unordered support pair, `pitches.py` lazily samples positions along the
+span and attachment heights using `search_step`. It generates one A-frame
+orientation and both lean-to orientations requested by the input, stopping at
+the explicit `max_search_states` boundary without first materializing a large
+grid.
 
 Every geometry then passes, in order:
 
@@ -56,10 +57,10 @@ Every geometry then passes, in order:
 3. no tarp, stake, or guyline conflict with circular keep-outs;
 4. an exact one-to-one cord assignment, when inventory is supplied.
 
-Cord assignment searches whole reusable segments and minimizes total unused
-length. A pitch requires only three lines for lean-to or five for A-frame, so the
-search dimension is fixed by the supported pitch types even when the inventory
-contains extra segments.
+Cord assignment uses an exact dynamic program over assigned-line subsets and
+minimizes total unused length. A pitch requires only three lines for lean-to or
+five for A-frame, so extra inventory grows work linearly rather than creating a
+factorial permutation search.
 
 ## Deterministic ranking and artifacts
 
@@ -68,7 +69,8 @@ Candidates sort by:
 1. wind-alignment penalty when `wind_from_deg` exists;
 2. total unused assigned cord;
 3. distance from preferred ridge height;
-4. a stable geometry identifier.
+4. a stable collision-free geometry identifier containing the support IDs,
+   pitch type, full grid coordinates, and orientation.
 
 JSON keys are sorted, CSV uses explicit LF records, SVG coordinates use fixed
 decimal formatting, HTML contains no scripts or timestamps, and the demo ZIP

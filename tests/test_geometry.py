@@ -12,7 +12,7 @@ from tarpscout.geometry import (
     segment_intersects_circle,
 )
 from tarpscout.models import CircleKeepout, Footprint, Point, parse_scenario
-from tarpscout.pitches import enumerate_geometries
+from tarpscout.pitches import _grid, enumerate_geometries
 
 
 def test_rotated_rectangle_uses_declared_center_and_angle() -> None:
@@ -33,6 +33,54 @@ def test_polygon_margin_rejects_point_too_close_to_edge() -> None:
 
     assert point_in_polygon(Point(0.2, 1.0), polygon)
     assert not point_in_polygon(Point(0.2, 1.0), polygon, margin=0.25)
+
+
+def test_search_grid_is_lazy_and_includes_the_stop() -> None:
+    grid = _grid(0.0, 1.0, 0.4)
+
+    assert iter(grid) is grid
+    assert tuple(grid) == (0.0, 0.4, 0.8, 1.0)
+
+
+def test_search_limit_stops_an_extremely_fine_grid() -> None:
+    raw = survey_dict()
+    raw["requirements"]["search_step"] = 1e-9
+    raw["requirements"]["max_search_states"] = 1
+
+    generated = enumerate_geometries(parse_scenario(raw))
+
+    assert generated.search_states == 1
+    assert generated.search_limited is True
+    assert generated.rejections["search_limit"] == 1
+
+
+def test_fine_search_grid_keeps_candidate_ids_unique() -> None:
+    raw = survey_dict()
+    raw["requirements"]["pitch_types"] = ["a_frame"]
+    raw["requirements"]["search_step"] = 0.0001
+    raw["requirements"]["max_search_states"] = 4
+
+    generated = enumerate_geometries(parse_scenario(raw))
+    identifiers = [geometry.id for geometry in generated.geometries]
+
+    assert len(identifiers) == len(set(identifiers))
+
+
+def test_support_id_delimiters_cannot_collide_candidate_ids() -> None:
+    raw = survey_dict()
+    raw["supports"] = [
+        {"id": "a", "x": 0, "y": 0, "min_height": 1.5, "max_height": 1.5},
+        {"id": "b--c", "x": 5, "y": 0, "min_height": 1.5, "max_height": 1.5},
+        {"id": "a--b", "x": 0, "y": 10, "min_height": 1.5, "max_height": 1.5},
+        {"id": "c", "x": 5, "y": 10, "min_height": 1.5, "max_height": 1.5},
+    ]
+    raw["requirements"]["pitch_types"] = ["a_frame"]
+    raw["requirements"]["ridge_height"] = {"min": 1.5, "max": 1.5, "preferred": 1.5}
+
+    generated = enumerate_geometries(parse_scenario(raw))
+    identifiers = [geometry.id for geometry in generated.geometries]
+
+    assert len(identifiers) == len(set(identifiers))
 
 
 @pytest.mark.parametrize(

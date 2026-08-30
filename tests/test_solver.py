@@ -30,6 +30,23 @@ def test_cord_assignment_reports_shortage_and_stable_ties() -> None:
     assert tied[0].cord_id == "a-cord"
 
 
+def test_cord_assignment_handles_large_inventory_exactly() -> None:
+    needs = tuple(CordNeed(f"line-{length}", float(length)) for length in range(10, 5, -1))
+    cords = tuple(Cord(f"cord-{length:03d}", float(length)) for length in range(1, 81))
+
+    assignment = assign_cords(needs, cords)
+
+    assert assignment is not None
+    assert [use.cord_id for use in assignment] == [
+        "cord-010",
+        "cord-009",
+        "cord-008",
+        "cord-007",
+        "cord-006",
+    ]
+    assert sum(use.spare_length for use in assignment) == 0
+
+
 def test_feasible_site_returns_ranked_a_frame_with_cords() -> None:
     result = solve(parse_scenario(survey_dict()), limit=3)
 

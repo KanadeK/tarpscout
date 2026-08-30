@@ -17,8 +17,11 @@ All notable user-visible changes are documented here.
 - Feasible and blocking example surveys, English/Chinese documentation, and a
   one-command local release gate.
 - Wheel, source archive, and deterministic demo-bundle release artifacts.
+- Lazy bounded grid generation and exact subset-based cord assignment that
+  remains practical with large cord inventories.
 
 ### Security
 
 - Strict unknown-field rejection, finite-number/range checks, filename-safe
-  scenario names, escaped SVG/HTML text, and no runtime network or dependencies.
+  scenario names, simple-polygon enforcement, escaped SVG/HTML text,
+  spreadsheet-safe CSV text, and no runtime network or dependencies.

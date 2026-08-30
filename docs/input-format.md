@@ -7,6 +7,11 @@ metres in a local, level XY plane; angles are degrees.
 Start from [pine-gap.site.json](../examples/pine-gap.site.json) rather than
 typing the structure from scratch.
 
+Every `id` is a non-empty printable Unicode string and must be unique within
+its collection. Control characters are rejected because IDs are rendered into
+CSV, SVG, and HTML. Formula-shaped text is preserved in JSON but prefixed with
+an apostrophe in CSV cells so spreadsheet software treats it as text.
+
 ## Top-level fields
 
 | Field | Required | Meaning |
@@ -24,7 +29,7 @@ typing the structure from scratch.
 
 Each support has:
 
-- `id`: non-empty identifier;
+- `id`: non-empty printable identifier;
 - `x`, `y`: local coordinates;
 - `min_height`, `max_height`: allowable attachment range, with
   `0 <= min_height <= max_height` and positive maximum;
@@ -84,7 +89,7 @@ allowances.
 | `stake_setback` | Positive horizontal distance beyond a tarp edge |
 | `knot_allowance` | Non-negative extra length on every line |
 | `coverage_margin` | Non-negative inward clearance for required footprints |
-| `search_step` | Positive sampling step for position and attachment height |
+| `search_step` | Sampling step for position and attachment height, at least `0.000000001` m |
 | `end_clearance` | Non-negative tarp-to-support clearance at both ridge ends |
 | `max_search_states` | Integer from 1 through 1,000,000 |
 | `wind_from_deg` | Optional direction wind comes from: 0 north, 90 east, 180 south, 270 west |
@@ -96,5 +101,6 @@ candidates appear in a successful report; it does not enlarge the search.
 
 `tarpscout validate SITE.json` returns `0` and prints `valid: <name>` when the
 document is accepted. Invalid JSON, unknown/missing fields, non-finite numbers,
-bad ranges, duplicate IDs, and invalid collection cardinalities return `2` with
-the exact failing field path on stderr.
+bad ranges, duplicate IDs, repeated/self-intersecting polygon points, and
+invalid collection cardinalities return `2` with the exact failing field path
+on stderr.
