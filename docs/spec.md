@@ -116,7 +116,7 @@ Outputs must be byte-stable for the same input and version.
 - Python standard library at runtime
 - `argparse` CLI and `dataclasses` domain model
 - `pytest`, `pytest-cov`, `ruff`, `mypy`, and `build` in the locked dev group
-- Hatchling build backend, wheel plus source archive
+- uv build backend, wheel plus source archive
 - GitHub Actions on Ubuntu/Python 3.11 and Windows/Python 3.14
 
 ## Commands
