@@ -159,10 +159,18 @@ def _plan_svg(scenario: Scenario, candidate: CandidateSolution) -> str:
     for support in scenario.supports:
         x, y = xy(support.point)
         shapes.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="6" fill="#315c3b"/>')
+        shapes.append(
+            f'<text x="{x + 8:.2f}" y="{y - 8:.2f}" font-family="sans-serif" '
+            f'font-size="12">{html.escape(support.id)}</text>'
+        )
     for stake in geometry.stakes:
         x, y = xy(stake.point)
         shapes.append(
             f'<rect x="{x - 4:.2f}" y="{y - 4:.2f}" width="8" height="8" fill="#9a2f1f"/>'
+        )
+        shapes.append(
+            f'<text x="{x + 6:.2f}" y="{y + 14:.2f}" font-family="sans-serif" '
+            f'font-size="11">{html.escape(stake.id)}</text>'
         )
     shapes.append(
         '<text x="40" y="585" font-family="sans-serif" font-size="12">'
@@ -208,7 +216,8 @@ def _elevation_svg(scenario: Scenario, candidate: CandidateSolution) -> str:
                     '<text x="40" y="555" font-family="sans-serif" font-size="14">'
                     f"ridge {geometry.ridge_height:.2f} m · "
                     f"edge {geometry.edge_height:.2f} m · "
-                    f"slope {geometry.slope_angle_deg:.1f}°</text>"
+                    f"slope {geometry.slope_angle_deg:.1f}° · "
+                    f"stake setback {scenario.requirements.stake_setback:.2f} m</text>"
                 ),
                 "</svg>",
             ]

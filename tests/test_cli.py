@@ -57,6 +57,11 @@ def test_feasible_solve_writes_complete_artifact_set(tmp_path: Path) -> None:
     assert html.count("<svg") == 2
     assert 'src="pine-gap.plan.svg"' not in html
     assert "<script" not in html
+    plan = (output / "pine-gap.plan.svg").read_text(encoding="utf-8")
+    assert "west-pine" in plan
+    assert "left-start" in plan
+    elevation = (output / "pine-gap.elevation.svg").read_text(encoding="utf-8")
+    assert "stake setback 0.80 m" in elevation
 
 
 def test_no_solution_writes_only_diagnostic_json_and_exits_one(tmp_path: Path) -> None:
