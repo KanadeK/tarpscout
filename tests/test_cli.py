@@ -114,3 +114,25 @@ def test_no_solution_removes_stale_artifacts_for_same_scenario(tmp_path: Path) -
 
     assert run_cli("solve", str(survey), "--output", str(output)).returncode == 1
     assert [path.name for path in output.iterdir()] == ["pine-gap.report.json"]
+
+
+def test_demo_command_runs_feasible_and_blocking_scenarios(tmp_path: Path) -> None:
+    output = tmp_path / "demo"
+
+    completed = run_cli("demo", str(output))
+
+    assert completed.returncode == 0, completed.stderr
+    expected = {
+        "pine-gap": "found",
+        "creek-lean-to": "found",
+        "fire-ring": "no_solution",
+        "short-cords": "no_solution",
+    }
+    assert completed.stdout.splitlines() == [
+        f"{status}: {name}" for name, status in expected.items()
+    ]
+    for name, status in expected.items():
+        scenario_dir = output / name
+        assert (scenario_dir / f"{name}.site.json").is_file()
+        report = json.loads((scenario_dir / f"{name}.report.json").read_text(encoding="utf-8"))
+        assert report["result"]["status"] == status

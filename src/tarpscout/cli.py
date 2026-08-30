@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from collections.abc import Sequence
 from pathlib import Path
 
 from tarpscout import __version__
-from tarpscout.models import InputError, load_scenario
+from tarpscout.demo_data import demo_documents
+from tarpscout.models import InputError, load_scenario, parse_scenario
 from tarpscout.render import write_artifacts
 from tarpscout.solver import solve
 
@@ -33,12 +35,28 @@ def _parser() -> argparse.ArgumentParser:
     solve_command.add_argument("survey", type=Path)
     solve_command.add_argument("--output", type=Path, default=Path("tarpscout-output"))
     solve_command.add_argument("--limit", type=_positive_integer, default=5)
+    demo = commands.add_parser("demo", help="write and solve built-in example surveys")
+    demo.add_argument("output", type=Path)
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        if args.command == "demo":
+            for document in demo_documents():
+                scenario = parse_scenario(document)
+                scenario_output = args.output / scenario.name
+                scenario_output.mkdir(parents=True, exist_ok=True)
+                (scenario_output / f"{scenario.name}.site.json").write_text(
+                    json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8",
+                    newline="\n",
+                )
+                result = solve(scenario)
+                write_artifacts(scenario_output, scenario, result)
+                print(f"{result.status}: {scenario.name}")
+            return 0
         scenario = load_scenario(args.survey)
         if args.command == "validate":
             print(f"valid: {scenario.name}")
