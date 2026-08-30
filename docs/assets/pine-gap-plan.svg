@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+<rect width="800" height="600" fill="#f7f3e8"/>
+<text x="40" y="28" font-family="sans-serif" font-size="18">pine-gap — plan</text>
+<polygon points="40.00,560.00 477.50,560.00 477.50,60.00 40.00,60.00" fill="#dce9cc" stroke="#668542" stroke-width="2"/>
+<polygon points="196.25,341.25 321.25,341.25 321.25,278.75 196.25,278.75" fill="#9fc8de" stroke="#28627f" stroke-width="2"/>
+<polygon points="146.25,366.25 333.75,366.25 333.75,253.75 146.25,253.75" fill="#e7c55c" fill-opacity=".55" stroke="#8a6710" stroke-width="3"/>
+<line x1="102.50" y1="310.00" x2="415.00" y2="310.00" stroke="#5b4636" stroke-width="2"/>
+<line x1="146.25" y1="253.75" x2="146.25" y2="203.75" stroke="#5b4636" stroke-width="2"/>
+<line x1="333.75" y1="253.75" x2="333.75" y2="203.75" stroke="#5b4636" stroke-width="2"/>
+<line x1="146.25" y1="366.25" x2="146.25" y2="416.25" stroke="#5b4636" stroke-width="2"/>
+<line x1="333.75" y1="366.25" x2="333.75" y2="416.25" stroke="#5b4636" stroke-width="2"/>
+<circle cx="102.50" cy="310.00" r="6" fill="#315c3b"/>
+<text x="110.50" y="302.00" font-family="sans-serif" font-size="12">west-pine</text>
+<circle cx="415.00" cy="310.00" r="6" fill="#315c3b"/>
+<text x="423.00" y="302.00" font-family="sans-serif" font-size="12">east-pine</text>
+<rect x="142.25" y="199.75" width="8" height="8" fill="#9a2f1f"/>
+<text x="152.25" y="217.75" font-family="sans-serif" font-size="11">left-start</text>
+<rect x="329.75" y="199.75" width="8" height="8" fill="#9a2f1f"/>
+<text x="339.75" y="217.75" font-family="sans-serif" font-size="11">left-end</text>
+<rect x="142.25" y="412.25" width="8" height="8" fill="#9a2f1f"/>
+<text x="152.25" y="430.25" font-family="sans-serif" font-size="11">right-start</text>
+<rect x="329.75" y="412.25" width="8" height="8" fill="#9a2f1f"/>
+<text x="339.75" y="430.25" font-family="sans-serif" font-size="11">right-end</text>
+<text x="40" y="585" font-family="sans-serif" font-size="12">green=stake zone · red=keep-out · blue=footprint · gold=tarp</text>
+</svg>

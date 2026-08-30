@@ -18,6 +18,12 @@ site data.
 > tree, pole, knot, stake, or fabric-safety approval. Verify every pitch on site
 > and follow equipment and land-manager instructions.
 
+![A generated TarpScout plan showing supports, tarp coverage, footprint, guylines, and stakes](docs/assets/pine-gap-plan.svg)
+
+This is the actual `pine-gap` solver output: green is measured stakeable ground,
+blue is the required footprint, gold is tarp coverage, and the labelled red
+squares are recommended stakes.
+
 [简体中文说明](docs/README.zh-CN.md) · [Input reference](docs/input-format.md) ·
 [Troubleshooting](docs/troubleshooting.md) · [Why this is different](docs/novelty-research.md)
 
