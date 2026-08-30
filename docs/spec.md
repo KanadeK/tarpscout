@@ -59,7 +59,7 @@ The top-level JSON object contains:
   `length`. When present, every required line must receive one whole segment.
 - `requirements`: requested pitch types, ridge-height range, edge height,
   allowed roof-slope range, stake setback, knot allowance, coverage margin,
-  search step, result limit, and optional prevailing wind direction.
+  search step, maximum search states, and optional prevailing wind direction.
 
 Unknown fields fail validation so misspelled constraints cannot be silently
 ignored. Detailed field semantics and an annotated example live in

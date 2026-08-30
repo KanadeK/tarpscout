@@ -1,17 +1,17 @@
 # TarpScout v0.1.0 checklist
 
-- [ ] Independent repository and correct local author
-- [ ] Spec, plan, packaging, and locked toolchain
-- [ ] Typed boundary model and validation tests
-- [ ] Geometry and pitch projection tests
-- [ ] Exact reusable-cord assignment
-- [ ] Deterministic solver and rejection diagnostics
-- [ ] Feasible and blocking example surveys
-- [ ] JSON, CSV, SVG, and script-free HTML artifacts
-- [ ] CLI exit-code integration tests
-- [ ] English and Chinese documentation
+- [x] Independent repository and correct local author
+- [x] Spec, plan, packaging, and locked toolchain
+- [x] Typed boundary model and validation tests
+- [x] Geometry and pitch projection tests
+- [x] Exact reusable-cord assignment
+- [x] Deterministic solver and rejection diagnostics
+- [x] Feasible and blocking example surveys
+- [x] JSON, CSV, SVG, and script-free HTML artifacts
+- [x] CLI exit-code integration tests
+- [x] English and Chinese documentation
 - [ ] CI and tag-driven release workflow
-- [ ] Full local release gate
+- [x] Full local release gate
 - [ ] Five-axis review, secret scan, and contributor audit
 - [ ] Public repository and passing remote CI
 - [ ] Annotated `v0.1.0` and verified Release assets

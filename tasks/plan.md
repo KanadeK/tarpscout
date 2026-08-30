@@ -23,10 +23,10 @@ model -> geometry -> pitch candidates -> cord assignment
    - Verify: `uv run pytest tests/test_models.py -q`.
 3. Geometry and pitch projections
    - Acceptance: containment, keep-outs, A-frame, and lean-to match hand math.
-   - Verify: `uv run pytest tests/test_geometry.py tests/test_pitches.py -q`.
+   - Verify: `uv run pytest tests/test_geometry.py tests/test_solver.py -q`.
 4. Exact cord assignment
    - Acceptance: minimum-slack one-to-one assignment and proven shortage.
-   - Verify: `uv run pytest tests/test_cords.py -q`.
+   - Verify: `uv run pytest tests/test_solver.py -q`.
 5. Solver and diagnostics
    - Acceptance: deterministic ranked solutions and counted rejection reasons.
    - Verify: `uv run pytest tests/test_solver.py -q`.
